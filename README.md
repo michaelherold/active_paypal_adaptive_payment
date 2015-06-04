@@ -1,5 +1,7 @@
 # Active PayPal Adaptive Payment
 
+**TODO:** Need to update the readme.
+
 This library is meant to interface with PayPal's Adaptive Payment Gateway.
 
 [Active Merchant]:http://www.activemerchant.org
@@ -62,7 +64,7 @@ See [iAuction: An Adaptive Payments Tutorial Featuring Parallel Payments](https:
 ### Cancel pre-approved payment
 
      gateway.cancel_preapproval(:preapproval_key => "preapprovalkey")
- 
+
 ### Chained payments
 
     def checkout
