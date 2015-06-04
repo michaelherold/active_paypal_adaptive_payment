@@ -1,4 +1,5 @@
 require 'hashie'
+require 'json'
 
 module ActiveMerchant
   module Billing
