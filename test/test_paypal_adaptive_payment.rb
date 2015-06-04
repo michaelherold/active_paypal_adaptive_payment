@@ -15,14 +15,7 @@ class TestPaypalAdaptivePayment < Minitest::Test
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
     refute_nil key = response.authorization
     url = @gateway.redirect_url_for(key)
-    assert_match /#{key}$/, url
-  end
-
-  def test_redirect_url_for
-    assert response = @gateway.setup_purchase(fixtures(:pay_options))
-    refute_nil key = response.authorization
-    url = @gateway.redirect_url_for(key)
-    assert_match /#{key}$/, url
+    assert_match(/#{key}$/, url)
   end
 
   def test_redirect_pre_approval_url_for
@@ -30,14 +23,14 @@ class TestPaypalAdaptivePayment < Minitest::Test
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
     refute_nil key = response["preapprovalKey"]
     url = @gateway.redirect_pre_approval_url_for(key)
-    assert_match /#{key}$/, url
+    assert_match(/#{key}$/, url)
   end
 
   def test_embedded_flow_url_for
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
     refute_nil key = response.authorization
     url = @gateway.embedded_flow_url_for(key)
-    assert_match /#{key}$/, url
+    assert_match(/#{key}$/, url)
   end
 
   def test_successful_paydetails
