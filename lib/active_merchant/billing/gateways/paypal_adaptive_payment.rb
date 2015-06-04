@@ -32,47 +32,186 @@ module ActiveMerchant
         super
       end
 
+      # @param [Hash] options
+      # @option options [String] :action_type
+      # @option options [String] :cancel_url
+      # @option options [String] :currency_code
+      # @option options [String] :custom
+      # @option options [String] :error_language
+      # @option options [String] :fees_payer
+      # @option options [String] :ipn_notification_url
+      # @option options [String] :memo
+      # @option options [String] :pin
+      # @option options [String] :preapproval_key
+      # @option options [Enumerable] :receiver_list
+      # @option options [String] :return_url
+      # @option options [String] :reverse_all_parallel_payments_on_error
+      # @option options [String] :sender_email
+      # @option options [String] :tracking_id
+      #
+      # @option receiver_list [String, Integer] :amount
+      # @option receiver_list [String] :email
+      # @option receiver_list [String] :invoice_id
+      # @option receiver_list [String] :payment_type
+      # @option receiver_list [String] :primary
       def setup_purchase(options)
+        requires!(options, :cancel_url, :receiver_list, :return_url)
+
         commit('Pay', build_adaptive_payment_pay_request(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [String] :pay_key
+      # @option options [String] :transaction_id
       def details_for_payment(options)
         commit('PaymentDetails', build_adaptive_payment_details_request(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [String] :pay_key
       def get_shipping_addresses(options)
+        requires!(options, :pay_key)
+
         commit('GetShippingAddresses', build_adaptive_get_shipping_addresses_request(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [String] :pay_key
       def get_payment_options(options)
+        requires!(options, :pay_key)
+
         commit('GetPaymentOptions', build_adaptive_get_payment_options_request(options))
       end
 
+      # @param [Hash] options
+      # @option options [Hash] :display_options
+      # @option options [String] :error_language
+      # @option options [Enumerable] :receiver_options
+      # @option options [Hash] :sender
+      #
+      # @option display_options [String] :business_name
+      # @option display_options [String] :email_header_image_url
+      # @option display_options [String] :email_marketing_image_url
+      # @option display_options [String] :header_image_url
+      #
+      # @option receiver_options [String] :description
+      # @option receiver_options [String] :custom_id
+      # @option receiver_options [Hash] :invoice_data
+      # @option receiver_options [Hash] :receiver
+      # @option receiver_options [String] :referrer_code
+      #
+      # @option sender [String] :referrerCode
+      # @option sender [String] :require_shipping_address_selection
+      # @option sender [String] :share_address
+      # @option sender [String] :share_phone_number
+      #
+      # @option invoice_data [Enumerable] :item
+      # @option invoice_data [Integer, String] :total_tax
+      # @option invoice_data [Integer, String] :total_shipping
+      #
+      # @option item [String] :identifier
+      # @option item [String] :item_price
+      # @option item [String] :item_count
+      # @option item [String] :name
+      # @option item [String] :price
+      #
+      # @option receiver [String] :email
+      # @option receiver [Hash] :phone
+      #
+      # @option phone [Integer, String] :country_code
+      # @option phone [Integer, String] :phone_number
+      # @option phone [Integer, String] :extension
       def set_payment_options(options)
+        requires!(options, :pay_key)
+
         commit('SetPaymentOptions', build_adaptive_set_payment_options_request(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :currency_code
+      # @option options [String] :error_language
+      # @option options [String] :fees_payer
+      # @option options [String] :pay_key
+      # @option options [Enumerable] :receiver_list
+      # @option options [String] :transaction_id
+      #
+      # @option receiver_list [String, Integer] :amount
+      # @option receiver_list [String] :email
+      # @option receiver_list [String] :primary
       def refund(options)
+        requires!(options, :receiver_list)
+        options[:receiver_list].each do |receiver|
+          requires!(receiver, :amount, :email)
+        end
+
         commit('Refund', build_adaptive_refund_details(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [String] :funding_plan_id
+      # @option options [String] :pay_key
       def execute_payment(options)
         commit('ExecutePayment', build_adaptive_execute_payment_request(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :cancel_url
+      # @option options [String] :currency_code
+      # @option options [String] :displayMaxTotalAmount
+      # @option options [DateTime] :end_date
+      # @option options [String] :error_language
+      # @option options [String] :max_amount
+      # @option options [String] :maxAmountPerPayment
+      # @option options [String] :maxNumberOfPayments
+      # @option options [String] :memo
+      # @option options [String] :notify_url
+      # @option options [String] :return_url
+      # @option options [String] :senderEmail
+      # @option options [DateTime] :start_date
       def preapprove_payment(options)
+        requires!(options, :cancel_url, :end_date, :max_amount, :return_url)
+
         commit('Preapproval', build_preapproval_payment(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [String] :preapproval_key
       def cancel_preapproval(options)
+        requires!(options, :preapproval_key)
+
         commit('CancelPreapproval', build_cancel_preapproval(options))
       end
 
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [String] :get_billing_address
+      # @option options [String] :preapproval_key
       def preapproval_details_for(options)
+        requires!(options, :preapproval_key)
+
         commit('PreapprovalDetails', build_preapproval_details(options))
       end
 
+      # TODO: to_currencies should be an array instead of a hash.
+      #
+      # @param [Hash] options
+      # @option options [String] :error_language
+      # @option options [Hash] :currency_list
+      # @option options [Hash] :to_currencies
+      #
+      # @option currency_list [Integer] :amount
+      # @option currency_list [String] :code
       def convert_currency(options)
+        requires!(options, :currency_list, :to_currencies)
+        options[:currency_list].each do |currency|
+          requires!(currency, :amount, :code)
+        end
+
         commit('ConvertCurrency', build_currency_conversion(options))
       end
 
@@ -367,7 +506,7 @@ module ActiveMerchant
             options[:currency_list].each do |currency|
               x.currency do |x|
                 x.amount currency[:amount]
-                x.code currency[:code ]
+                x.code currency[:code]
               end
             end
           end
