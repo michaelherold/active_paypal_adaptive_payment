@@ -1,3 +1,4 @@
+require 'active_merchant/billing/gateways/paypal/paypal_common_api'
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/ext'
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/adaptive_payment_response'
 
@@ -5,6 +6,8 @@ module ActiveMerchant
   module Billing
 
     class PaypalAdaptivePayment < Gateway
+      include PaypalCommonAPI
+
       class_attribute :test_redirect_url
       class_attribute :live_redirect_url
       class_attribute :test_redirect_pre_approval_url
@@ -391,8 +394,33 @@ module ActiveMerchant
         end
       end
 
+      def authorization_from(response)
+        response[:pay_key] || super
+      end
+
+      def build_response(success, message, response, options = {})
+        AdaptivePaymentResponse.new(success, message, response, options)
+      end
+
       def commit(action, data)
-        @response = AdaptivePaymentResponse.new(post_through_ssl(action, data), data, action)
+        response = parse(post_through_ssl(action, data))
+
+        build_response(successful?(response), message_from(response), response,
+          test: test?,
+          authorization: authorization_from(response)
+        )
+      end
+
+      def message_from(response)
+        return response[:response_envelope][:ack] unless response.key?(:error)
+
+        response[:error].first[:message]
+      end
+
+      def parse(response)
+        response = JSON.parse(response)
+        response = Hash[response.map { |k, v| [k.underscore, v] }]
+        response = response.with_indifferent_access
       end
 
       def post_through_ssl(action, parameters = {})
@@ -420,6 +448,10 @@ module ActiveMerchant
 
       def endpoint_url
         test? ? TEST_URL : LIVE_URL
+      end
+
+      def successful?(response)
+        SUCCESS_CODES.include?(response[:response_envelope][:ack])
       end
 
       def test?

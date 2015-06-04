@@ -1,7 +1,6 @@
 require_relative 'test_helper'
 
 class TestPaypalAdaptivePayment < MiniTest::Unit::TestCase
-
   def setup
     @gateway = ActiveMerchant::Billing::PaypalAdaptivePayment.new(fixtures(:credentials))
   end
@@ -9,19 +8,20 @@ class TestPaypalAdaptivePayment < MiniTest::Unit::TestCase
   def test_successful_pay
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
     assert_equal true, response.success?, "Unsuccessful Transaction"
-    assert_equal "CREATED","#{response.payment_exec_status}"
+    refute_nil response.authorization
+    assert_equal "CREATED", "#{response.status}"
   end
 
   def test_redirect_url_for
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
-    refute_nil key = response["pay_key"]
+    refute_nil key = response.authorization
     url = @gateway.redirect_url_for(key)
     assert_match /#{key}$/, url, "Could not generate the proper redirect_url_for URL"
   end
 
   def test_redirect_url_for
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
-    refute_nil key = response["pay_key"]
+    refute_nil key = response.authorization
     url = @gateway.redirect_url_for(key)
     assert_match /#{key}$/, url, "Could not generate the proper redirect_url_for URL"
   end
@@ -36,7 +36,7 @@ class TestPaypalAdaptivePayment < MiniTest::Unit::TestCase
 
   def test_embedded_flow_url_for
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
-    refute_nil key = response["pay_key"]
+    refute_nil key = response.authorization
     url = @gateway.embedded_flow_url_for(key)
     assert_match /#{key}$/, url, "Could not generate the proper embedded_flow_url_for URL"
   end
@@ -65,5 +65,4 @@ class TestPaypalAdaptivePayment < MiniTest::Unit::TestCase
     assert response = @gateway.preapprove_payment(preapproval_options)
     assert_equal true, response.success?, "Unsuccessful Transaction"
   end
-
 end
