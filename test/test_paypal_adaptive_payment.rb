@@ -19,9 +19,9 @@ class TestPaypalAdaptivePayment < Minitest::Test
   end
 
   def test_redirect_pre_approval_url_for
-    skip("Need to debug this, not sure about the exact options...")
+    skip('Need to debug this, not sure about the exact options...')
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
-    refute_nil key = response["preapprovalKey"]
+    refute_nil key = response.authorization
     url = @gateway.redirect_pre_approval_url_for(key)
     assert_match(/#{key}$/, url)
   end

@@ -2,7 +2,6 @@ require 'active_merchant/billing/gateways/paypal/paypal_common_api'
 
 module ActiveMerchant
   module Billing
-
     class PaypalAdaptivePayment < Gateway
       include PaypalCommonAPI
 
@@ -17,13 +16,14 @@ module ActiveMerchant
       EMBEDDED_FLOW_TEST_URL = 'https://www.sandbox.paypal.com/webapps/adaptivepayment/flow/pay'
       EMBEDDED_FLOW_LIVE_URL = 'https://www.paypal.com/webapps/adaptivepayment/flow/pay'
 
-      self.test_redirect_url= "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey="
-      self.test_redirect_pre_approval_url= "https://www.sandbox.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey="
+      self.display_name = 'Paypal Adaptive Payments'
+      self.homepage_url = 'https://developer.paypal.com/docs/classic/adaptive-payments/gs_AdaptivePayments/'
+      self.supported_countries = ['US']
+
+      self.test_redirect_url = 'https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey='
+      self.test_redirect_pre_approval_url = 'https://www.sandbox.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey='
       self.live_redirect_url = 'https://www.paypal.com/webscr?cmd=_ap-payment&paykey='
       self.live_redirect_pre_approval_url = 'https://www.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey='
-      self.supported_countries = ['US']
-      self.homepage_url = 'http://x.com/'
-      self.display_name = 'Paypal Adaptive Payments'
 
       def initialize(options = {})
         requires!(options, :appid, :login, :password, :signature)
@@ -128,6 +128,7 @@ module ActiveMerchant
       # @option phone [Integer, String] :country_code
       # @option phone [Integer, String] :phone_number
       # @option phone [Integer, String] :extension
+      # rubocop:disable Style/AccessorMethodName
       def set_payment_options(options)
         requires!(options, :pay_key)
 
@@ -247,7 +248,7 @@ module ActiveMerchant
       private
 
       def build_adaptive_payment_pay_request(opts)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.PayRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -283,7 +284,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_execute_payment_request(opts)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.ExecutePaymentRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -295,7 +296,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_payment_details_request(opts)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.PayRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -310,7 +311,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_get_shipping_addresses_request(opts)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.GetShippingAddressesRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -321,7 +322,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_get_payment_options_request(opts)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.GetPaymentOptionsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -334,7 +335,7 @@ module ActiveMerchant
       def build_adaptive_set_payment_options_request(opts)
         opts[:sender] ||= {}
 
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.SetPaymentOptionsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -391,7 +392,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_refund_details(options)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.RefundRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -419,38 +420,38 @@ module ActiveMerchant
 
       def build_preapproval_payment(options)
         opts = {
-          :currency_code => "USD",
-          :start_date => DateTime.current
+          currency_code: 'USD',
+          start_date: DateTime.current
         }.update(options)
 
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.PreapprovalRequest do |x|
           # request envelope
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
             x.errorLanguage opts[:error_language] ||= 'en_US'
-            x.senderEmail opts[:senderEmail] if opts.has_key?(:senderEmail)
+            x.senderEmail opts[:senderEmail] if opts.key?(:senderEmail)
           end
 
           # required preapproval fields
-          x.endingDate opts[:end_date].strftime("%Y-%m-%dT%H:%M:%S")
-          x.startingDate opts[:start_date].strftime("%Y-%m-%dT%H:%M:%S")
+          x.endingDate opts[:end_date].strftime('%Y-%m-%dT%H:%M:%S')
+          x.startingDate opts[:start_date].strftime('%Y-%m-%dT%H:%M:%S')
           x.maxTotalAmountOfAllPayments opts[:max_amount]
-          x.maxAmountPerPayment opts[:maxAmountPerPayment] if opts.has_key?(:maxAmountPerPayment)
-          x.memo opts[:memo] if opts.has_key?(:memo)
-          x.maxNumberOfPayments opts[:maxNumberOfPayments] if opts.has_key?(:maxNumberOfPayments)
+          x.maxAmountPerPayment opts[:maxAmountPerPayment] if opts.key?(:maxAmountPerPayment)
+          x.memo opts[:memo] if opts.key?(:memo)
+          x.maxNumberOfPayments opts[:maxNumberOfPayments] if opts.key?(:maxNumberOfPayments)
           x.currencyCode options[:currency_code]
           x.cancelUrl opts[:cancel_url]
           x.returnUrl opts[:return_url]
-          x.displayMaxTotalAmount opts[:displayMaxTotalAmount] if opts.has_key?(:displayMaxTotalAmount)
+          x.displayMaxTotalAmount opts[:displayMaxTotalAmount] if opts.key?(:displayMaxTotalAmount)
 
           # notify url
-          x.ipnNotificationUrl opts[:notify_url] if opts.has_key?(:notify_url)
+          x.ipnNotificationUrl opts[:notify_url] if opts.key?(:notify_url)
         end
       end
 
       def build_preapproval_details(options)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.PreapprovalDetailsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -462,7 +463,7 @@ module ActiveMerchant
       end
 
       def build_cancel_preapproval(options)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.PreapprovalDetailsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -473,7 +474,7 @@ module ActiveMerchant
       end
 
       def build_currency_conversion(options)
-        xml = Builder::XmlMarkup.new :indent => 2
+        xml = Builder::XmlMarkup.new indent: 2
         xml.ConvertCurrencyRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -488,7 +489,7 @@ module ActiveMerchant
             end
           end
           x.convertToCurrencyList do |x|
-            options[:to_currencies].each do |k,v|
+            options[:to_currencies].each do |_, v|
               x.currencyCode "#{v}"
             end
           end
@@ -560,7 +561,7 @@ module ActiveMerchant
       def parse(response)
         response = JSON.parse(response)
         response = Hash[response.map { |k, v| [k.underscore, v] }]
-        response = response.with_indifferent_access
+        response.with_indifferent_access
       end
 
       def successful?(response)
