@@ -27,8 +27,13 @@ module ActiveMerchant
       self.display_name = 'Paypal Adaptive Payments'
 
       def initialize(options = {})
-        requires!(options, :login, :password, :signature, :appid)
-        @options = options.dup
+        requires!(options, :appid, :login, :password, :signature)
+
+        @app_id = options[:appid]
+        @login = options[:login]
+        @password = options[:password]
+        @signature = options[:signature]
+
         super
       end
 
@@ -519,7 +524,22 @@ module ActiveMerchant
       end
 
       def action_url(action)
-        @url = URI.parse(endpoint_url + action)
+        URI.parse(endpoint_url + action)
+      end
+
+      def api_request(action, params = nil, options = {})
+        raw_response = response = nil
+        begin
+          raw_response = ssl_post(action_url(action), params, headers(options))
+          response = parse(raw_response)
+        rescue ResponseError => error
+          raw_response = error.response.body
+          response = parse(raw_response)
+        rescue JSON::ParserError
+          response = raw_response
+        end
+
+        response
       end
 
       def authorization_from(response)
@@ -530,8 +550,8 @@ module ActiveMerchant
         AdaptivePaymentResponse.new(success, message, response, options)
       end
 
-      def commit(action, data)
-        response = parse(post_through_ssl(action, data))
+      def commit(action, data, options = {})
+        response = api_request(action, data, headers(options))
 
         build_response(successful?(response), message_from(response), response,
           test: test?,
@@ -541,6 +561,19 @@ module ActiveMerchant
 
       def endpoint_url
         test? ? TEST_URL : LIVE_URL
+      end
+
+      def headers(options = {})
+        headers = {
+          'Content-Type'                  => 'text/xml',
+          'X-PAYPAL-APPLICATION-ID'       => @app_id,
+          'X-PAYPAL-REQUEST-DATA-FORMAT'  => 'XML',
+          'X-PAYPAL-RESPONSE-DATA-FORMAT' => 'JSON',
+          'X-PAYPAL-SECURITY-USERID'      => @login,
+          'X-PAYPAL-SECURITY-PASSWORD'    => @password,
+          'X-PAYPAL-SECURITY-SIGNATURE'   => @signature
+        }
+        headers.merge(options.slice(:appid, :login, :password, :signature))
       end
 
       def message_from(response)
@@ -553,29 +586,6 @@ module ActiveMerchant
         response = JSON.parse(response)
         response = Hash[response.map { |k, v| [k.underscore, v] }]
         response = response.with_indifferent_access
-      end
-
-      def post_through_ssl(action, parameters = {})
-        headers = {
-          "X-PAYPAL-REQUEST-DATA-FORMAT" => "XML",
-          "X-PAYPAL-RESPONSE-DATA-FORMAT" => "JSON",
-          "X-PAYPAL-SECURITY-USERID" => @options[:login],
-          "X-PAYPAL-SECURITY-PASSWORD" => @options[:password],
-          "X-PAYPAL-SECURITY-SIGNATURE" => @options[:signature],
-          "X-PAYPAL-APPLICATION-ID" => @options[:appid],
-        }
-        action_url(action)
-        request = Net::HTTP::Post.new(@url.path)
-        request.body = @xml
-        headers.each_pair { |k,v| request[k] = v }
-        request.content_type = 'text/xml'
-        server = Net::HTTP.new(@url.host, 443)
-        server.use_ssl = true
-        # OSX: sudo port install curl-ca-bundle
-        server.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        server.ca_path = '/etc/ssl/certs' if File.exists?('/etc/ssl/certs') # Ubuntu
-        server.ca_file = '/opt/local/share/curl/curl-ca-bundle.crt' if File.exists?('/opt/local/share/curl/curl-ca-bundle.crt') # Mac OS X
-        server.start { |http| http.request(request) }.body
       end
 
       def successful?(response)
