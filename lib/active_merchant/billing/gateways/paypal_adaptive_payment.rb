@@ -1,5 +1,4 @@
 require 'active_merchant/billing/gateways/paypal/paypal_common_api'
-require 'active_merchant/billing/gateways/paypal_adaptive_payments/adaptive_payment_response'
 
 module ActiveMerchant
   module Billing
@@ -520,7 +519,7 @@ module ActiveMerchant
       end
 
       def build_response(success, message, response, options = {})
-        AdaptivePaymentResponse.new(success, message, response, options)
+        Response.new(success, message, response, options)
       end
 
       def commit(action, data, options = {})

@@ -9,7 +9,6 @@ class TestPaypalAdaptivePayment < MiniTest::Unit::TestCase
     assert response = @gateway.setup_purchase(fixtures(:pay_options))
     assert_equal true, response.success?, "Unsuccessful Transaction"
     refute_nil response.authorization
-    assert_equal "CREATED", "#{response.status}"
   end
 
   def test_redirect_url_for
