@@ -261,8 +261,7 @@ module ActiveMerchant
           x.senderEmail opts[:sender_email] if opts.key?(:sender_email)
           x.cancelUrl opts[:cancel_url]
           x.returnUrl opts[:return_url]
-          x.ipnNotificationUrl opts[:ipn_notification_url] if
-            opts[:ipn_notification_url]
+          x.ipnNotificationUrl opts[:ipn_notification_url] if opts[:ipn_notification_url]
           x.memo opts[:memo] if opts.key?(:memo)
           x.custom opts[:custom] if opts.key?(:custom)
           x.feesPayer opts[:fees_payer] if opts[:fees_payer]
@@ -274,20 +273,19 @@ module ActiveMerchant
                 x.email receiver[:email]
                 x.amount receiver[:amount].to_s
                 x.primary receiver[:primary] if receiver.key?(:primary)
-                x.paymentType receiver[:payment_type] if
-                  receiver.key?(:payment_type)
-                x.invoiceId receiver[:invoice_id] if
-                  receiver.key?(:invoice_id)
+                x.paymentType receiver[:payment_type] if receiver.key?(:payment_type)
+                x.invoiceId receiver[:invoice_id] if receiver.key?(:invoice_id)
               end
             end
           end
           x.reverseAllParallelPaymentsOnError(
-            opts[:reverse_all_parallel_payments_on_error] || 'false')
+            opts[:reverse_all_parallel_payments_on_error] || 'false'
+          )
           x.trackingId opts[:tracking_id] if opts[:tracking_id]
-         end
+        end
       end
 
-    def build_adaptive_execute_payment_request(opts)
+      def build_adaptive_execute_payment_request(opts)
         @xml = ''
         xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
         xml.instruct!
@@ -298,7 +296,7 @@ module ActiveMerchant
           end
           x.payKey opts[:pay_key] if opts.key?(:pay_key)
           x.fundingPlanId opts[:funding_plan_id] if opts[:funding_plan_id]
-         end
+        end
       end
 
       def build_adaptive_payment_details_request(opts)
@@ -457,16 +455,14 @@ module ActiveMerchant
           x.maxTotalAmountOfAllPayments opts[:max_amount]
           x.maxAmountPerPayment opts[:maxAmountPerPayment] if opts.has_key?(:maxAmountPerPayment)
           x.memo opts[:memo] if opts.has_key?(:memo)
-          x.maxNumberOfPayments opts[:maxNumberOfPayments] if
-            opts.has_key?(:maxNumberOfPayments)
+          x.maxNumberOfPayments opts[:maxNumberOfPayments] if opts.has_key?(:maxNumberOfPayments)
           x.currencyCode options[:currency_code]
           x.cancelUrl opts[:cancel_url]
           x.returnUrl opts[:return_url]
           x.displayMaxTotalAmount opts[:displayMaxTotalAmount] if opts.has_key?(:displayMaxTotalAmount)
 
           # notify url
-          x.ipnNotificationUrl opts[:notify_url] if
-            opts.has_key?(:notify_url)
+          x.ipnNotificationUrl opts[:notify_url] if opts.has_key?(:notify_url)
         end
       end
 
@@ -480,8 +476,7 @@ module ActiveMerchant
             x.errorLanguage options[:error_language] ||= 'en_US'
           end
           x.preapprovalKey options[:preapproval_key]
-          x.getBillingAddress options[:get_billing_address] if
-            options[:get_billing_address]
+          x.getBillingAddress options[:get_billing_address] if options[:get_billing_address]
         end
       end
 
@@ -553,7 +548,10 @@ module ActiveMerchant
       def commit(action, data, options = {})
         response = api_request(action, data, headers(options))
 
-        build_response(successful?(response), message_from(response), response,
+        build_response(
+          successful?(response),
+          message_from(response),
+          response,
           test: test?,
           authorization: authorization_from(response)
         )
