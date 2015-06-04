@@ -15,6 +15,7 @@ tmtags
 *.swp
 
 coverage
+doc
 rdoc
 pkg
 .yardoc/*
