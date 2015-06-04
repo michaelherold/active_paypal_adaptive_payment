@@ -16,6 +16,5 @@ Gem::Specification.new do |s|
   s.require_path = %w(lib)
 
   s.add_dependency(%q<activemerchant>, [">= 1.5.1"])
-  s.add_dependency(%q<hashie>, [">= 1.2.0"])
   s.add_dependency(%q<mocha>, [">= 0.10.0"])
 end
