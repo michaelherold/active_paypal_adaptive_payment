@@ -1,4 +1,3 @@
-require 'money'
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/ext'
 require 'active_merchant/billing/gateways/paypal_adaptive_payment_common'
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/exceptions'
