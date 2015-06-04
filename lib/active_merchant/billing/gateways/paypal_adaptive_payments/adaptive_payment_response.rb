@@ -1,4 +1,3 @@
-      require 'multi_json'
 require 'hashie'
 
 module ActiveMerchant
@@ -13,7 +12,7 @@ module ActiveMerchant
 
       def initialize(json, xml_request = nil, action = nil)
         @json = json
-        @response = Hashie::Rash.new(MultiJson.decode(json))
+        @response = Hashie::Rash.new(JSON.parse(json))
         @xml_request = xml_request
         @request =  Hashie::Rash.from_xml(xml_request)
         @action = action
