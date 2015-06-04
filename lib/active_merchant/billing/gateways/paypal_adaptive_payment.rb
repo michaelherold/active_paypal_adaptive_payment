@@ -248,9 +248,7 @@ module ActiveMerchant
       private
 
       def build_adaptive_payment_pay_request(opts)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.PayRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -286,9 +284,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_execute_payment_request(opts)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.ExecutePaymentRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -300,9 +296,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_payment_details_request(opts)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.PayRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -317,9 +311,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_get_shipping_addresses_request(opts)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.GetShippingAddressesRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -330,9 +322,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_get_payment_options_request(opts)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.GetPaymentOptionsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -345,9 +335,7 @@ module ActiveMerchant
       def build_adaptive_set_payment_options_request(opts)
         opts[:sender] ||= {}
 
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.SetPaymentOptionsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -404,9 +392,7 @@ module ActiveMerchant
       end
 
       def build_adaptive_refund_details(options)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.RefundRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -438,9 +424,7 @@ module ActiveMerchant
           :start_date => DateTime.current
         }.update(options)
 
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.PreapprovalRequest do |x|
           # request envelope
           x.requestEnvelope do |x|
@@ -467,9 +451,7 @@ module ActiveMerchant
       end
 
       def build_preapproval_details(options)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.PreapprovalDetailsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -481,9 +463,7 @@ module ActiveMerchant
       end
 
       def build_cancel_preapproval(options)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.PreapprovalDetailsRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
@@ -494,9 +474,7 @@ module ActiveMerchant
       end
 
       def build_currency_conversion(options)
-        @xml = ''
-        xml = Builder::XmlMarkup.new :target => @xml, :indent => 2
-        xml.instruct!
+        xml = Builder::XmlMarkup.new :indent => 2
         xml.ConvertCurrencyRequest do |x|
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
