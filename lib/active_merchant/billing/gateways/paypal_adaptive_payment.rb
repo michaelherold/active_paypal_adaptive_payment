@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 require 'money'
-require File.dirname(__FILE__) + '/paypal_adaptive_payments/ext'
-require File.dirname(__FILE__) + '/paypal_adaptive_payment_common'
-require File.dirname(__FILE__) + '/paypal_adaptive_payments/exceptions'
-require File.dirname(__FILE__) + '/paypal_adaptive_payments/adaptive_payment_response'
+require 'active_merchant/billing/gateways/paypal_adaptive_payments/ext'
+require 'active_merchant/billing/gateways/paypal_adaptive_payment_common'
+require 'active_merchant/billing/gateways/paypal_adaptive_payments/exceptions'
+require 'active_merchant/billing/gateways/paypal_adaptive_payments/adaptive_payment_response'
 
 module ActiveMerchant
   module Billing
