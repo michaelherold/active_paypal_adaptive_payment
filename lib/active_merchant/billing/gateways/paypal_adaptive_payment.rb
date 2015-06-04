@@ -1,5 +1,4 @@
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/ext'
-require 'active_merchant/billing/gateways/paypal_adaptive_payment_common'
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/exceptions'
 require 'active_merchant/billing/gateways/paypal_adaptive_payments/adaptive_payment_response'
 
@@ -7,7 +6,10 @@ module ActiveMerchant
   module Billing
 
     class PaypalAdaptivePayment < Gateway
-      include PaypalAdaptivePaymentCommon
+      class_attribute :test_redirect_url
+      class_attribute :live_redirect_url
+      class_attribute :test_redirect_pre_approval_url
+      class_attribute :live_redirect_pre_approval_url
 
       TEST_URL = 'https://svcs.sandbox.paypal.com/AdaptivePayments/'
       LIVE_URL = 'https://svcs.paypal.com/AdaptivePayments/'
@@ -27,6 +29,8 @@ module ActiveMerchant
 
       self.test_redirect_url= "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey="
       self.test_redirect_pre_approval_url= "https://www.sandbox.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey="
+      self.live_redirect_url = 'https://www.paypal.com/webscr?cmd=_ap-payment&paykey='
+      self.live_redirect_pre_approval_url = 'https://www.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey='
       self.supported_countries = ['US']
       self.homepage_url = 'http://x.com/'
       self.display_name = 'Paypal Adaptive Payments'
@@ -91,6 +95,23 @@ module ActiveMerchant
 
       def debug
         {:url => @url, :request => @xml, :response => @response.json}
+      end
+
+      def redirect_url
+        test? ? test_redirect_url : live_redirect_url
+      end
+
+      # TODO: validate the token presence
+      def redirect_url_for(token)
+        "#{redirect_url}#{token}"
+      end
+
+      def redirect_pre_approval_url
+        test? ? test_redirect_pre_approval_url : live_redirect_pre_approval_url
+      end
+
+      def redirect_pre_approval_url_for(token)
+        "#{redirect_pre_approval_url}#{token}"
       end
 
       private
