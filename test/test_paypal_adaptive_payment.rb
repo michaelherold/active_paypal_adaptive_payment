@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-class TestPaypalAdaptivePayment < MiniTest::Unit::TestCase
+class TestPaypalAdaptivePayment < Minitest::Test
   def setup
     @gateway = ActiveMerchant::Billing::PaypalAdaptivePayment.new(fixtures(:credentials))
   end
