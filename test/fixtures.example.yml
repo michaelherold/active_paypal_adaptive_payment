@@ -2,7 +2,7 @@ credentials:
   login: APP_OWNER
   password: 1234567890
   signature: AKJJklhjg&^*&^75648798-7KJKLJKJHKJkjyuihklhkiyYIUKJL%&^%
-  appid: APP-80W284485P519543T
+  app_id: APP-80W284485P519543T
 
 paydetails_options:
   pay_key: AP-49N53304XXkjh2374P

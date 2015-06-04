@@ -26,9 +26,9 @@ module ActiveMerchant
       self.live_redirect_pre_approval_url = 'https://www.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey='
 
       def initialize(options = {})
-        requires!(options, :appid, :login, :password, :signature)
+        requires!(options, :app_id, :login, :password, :signature)
 
-        @app_id = options[:appid]
+        @app_id = options[:app_id]
         @login = options[:login]
         @password = options[:password]
         @signature = options[:signature]
@@ -43,13 +43,13 @@ module ActiveMerchant
       # @option options [String] :custom
       # @option options [String] :error_language
       # @option options [String] :fees_payer
-      # @option options [String] :ipn_notification_url
+      # @option options [String] :notify_url
       # @option options [String] :memo
       # @option options [String] :pin
       # @option options [String] :preapproval_key
       # @option options [Enumerable] :receiver_list
       # @option options [String] :return_url
-      # @option options [String] :reverse_all_parallel_payments_on_error
+      # @option options [String] :reverse_on_error
       # @option options [String] :sender_email
       # @option options [String] :tracking_id
       #
@@ -166,12 +166,12 @@ module ActiveMerchant
       # @param [Hash] options
       # @option options [String] :cancel_url
       # @option options [String] :currency_code
-      # @option options [String] :displayMaxTotalAmount
+      # @option options [String] :display_max_total_amount
       # @option options [DateTime] :end_date
       # @option options [String] :error_language
       # @option options [String] :max_amount
-      # @option options [String] :maxAmountPerPayment
-      # @option options [String] :maxNumberOfPayments
+      # @option options [String] :max_amount_per_payment
+      # @option options [String] :max_number_of_payments
       # @option options [String] :memo
       # @option options [String] :notify_url
       # @option options [String] :return_url
@@ -202,12 +202,10 @@ module ActiveMerchant
         commit('PreapprovalDetails', build_preapproval_details(options))
       end
 
-      # TODO: to_currencies should be an array instead of a hash.
-      #
       # @param [Hash] options
       # @option options [String] :error_language
       # @option options [Hash] :currency_list
-      # @option options [Hash] :to_currencies
+      # @option options [Enumerable] :to_currencies
       #
       # @option currency_list [Integer] :amount
       # @option currency_list [String] :code
@@ -259,7 +257,7 @@ module ActiveMerchant
           x.senderEmail opts[:sender_email] if opts.key?(:sender_email)
           x.cancelUrl opts[:cancel_url]
           x.returnUrl opts[:return_url]
-          x.ipnNotificationUrl opts[:ipn_notification_url] if opts[:ipn_notification_url]
+          x.ipnNotificationUrl opts[:notify_url] if opts[:notify_url]
           x.memo opts[:memo] if opts.key?(:memo)
           x.custom opts[:custom] if opts.key?(:custom)
           x.feesPayer opts[:fees_payer] if opts[:fees_payer]
@@ -276,9 +274,7 @@ module ActiveMerchant
               end
             end
           end
-          x.reverseAllParallelPaymentsOnError(
-            opts[:reverse_all_parallel_payments_on_error] || 'false'
-          )
+          x.reverseAllParallelPaymentsOnError opts[:reverse_on_error] || 'false'
           x.trackingId opts[:tracking_id] if opts[:tracking_id]
         end
       end
@@ -426,26 +422,23 @@ module ActiveMerchant
 
         xml = Builder::XmlMarkup.new indent: 2
         xml.PreapprovalRequest do |x|
-          # request envelope
           x.requestEnvelope do |x|
             x.detailLevel 'ReturnAll'
             x.errorLanguage opts[:error_language] ||= 'en_US'
             x.senderEmail opts[:senderEmail] if opts.key?(:senderEmail)
           end
 
-          # required preapproval fields
           x.endingDate opts[:end_date].strftime('%Y-%m-%dT%H:%M:%S')
           x.startingDate opts[:start_date].strftime('%Y-%m-%dT%H:%M:%S')
           x.maxTotalAmountOfAllPayments opts[:max_amount]
-          x.maxAmountPerPayment opts[:maxAmountPerPayment] if opts.key?(:maxAmountPerPayment)
+          x.max_amount_per_payment opts[:max_amount_per_payment] if opts.key?(:max_amount_per_payment)
           x.memo opts[:memo] if opts.key?(:memo)
-          x.maxNumberOfPayments opts[:maxNumberOfPayments] if opts.key?(:maxNumberOfPayments)
+          x.max_number_of_payments opts[:max_number_of_payments] if opts.key?(:max_number_of_payments)
           x.currencyCode options[:currency_code]
           x.cancelUrl opts[:cancel_url]
           x.returnUrl opts[:return_url]
-          x.displayMaxTotalAmount opts[:displayMaxTotalAmount] if opts.key?(:displayMaxTotalAmount)
+          x.display_max_total_amount opts[:display_max_total_amount] if opts.key?(:display_max_total_amount)
 
-          # notify url
           x.ipnNotificationUrl opts[:notify_url] if opts.key?(:notify_url)
         end
       end
@@ -489,7 +482,7 @@ module ActiveMerchant
             end
           end
           x.convertToCurrencyList do |x|
-            options[:to_currencies].each do |_, v|
+            options[:to_currencies].each do |v|
               x.currencyCode "#{v}"
             end
           end
