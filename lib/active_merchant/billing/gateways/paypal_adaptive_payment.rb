@@ -18,16 +18,6 @@ module ActiveMerchant
       EMBEDDED_FLOW_TEST_URL = 'https://www.sandbox.paypal.com/webapps/adaptivepayment/flow/pay'
       EMBEDDED_FLOW_LIVE_URL = 'https://www.paypal.com/webapps/adaptivepayment/flow/pay'
 
-      module FeesPayer
-        OPTIONS = %w(SENDER PRIMARYRECEIVER EACHRECEIVER SECONDARYONLY)
-        OPTIONS.each { |opt| const_set(opt, opt) }
-      end
-
-      module PaymentType
-        TYPES = %w(DIGITALGOODS)
-        TYPES.each { |pt| const_set(pt, pt) }
-      end
-
       self.test_redirect_url= "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey="
       self.test_redirect_pre_approval_url= "https://www.sandbox.paypal.com/webscr?cmd=_ap-preapproval&preapprovalkey="
       self.live_redirect_url = 'https://www.paypal.com/webscr?cmd=_ap-payment&paykey='
@@ -92,10 +82,6 @@ module ActiveMerchant
 
       def embedded_flow_url_for(token)
         "#{embedded_flow_url}?paykey=#{token}"
-      end
-
-      def debug
-        {:url => @url, :request => @xml, :response => @response.json}
       end
 
       def redirect_url
@@ -393,6 +379,10 @@ module ActiveMerchant
         end
       end
 
+      def action_url(action)
+        @url = URI.parse(endpoint_url + action)
+      end
+
       def authorization_from(response)
         response[:pay_key] || super
       end
@@ -408,6 +398,10 @@ module ActiveMerchant
           test: test?,
           authorization: authorization_from(response)
         )
+      end
+
+      def endpoint_url
+        test? ? TEST_URL : LIVE_URL
       end
 
       def message_from(response)
@@ -445,20 +439,12 @@ module ActiveMerchant
         server.start { |http| http.request(request) }.body
       end
 
-      def endpoint_url
-        test? ? TEST_URL : LIVE_URL
-      end
-
       def successful?(response)
         SUCCESS_CODES.include?(response[:response_envelope][:ack])
       end
 
       def test?
         @options[:test] || Base.gateway_mode == :test
-      end
-
-      def action_url(action)
-        @url = URI.parse(endpoint_url + action)
       end
     end
   end
