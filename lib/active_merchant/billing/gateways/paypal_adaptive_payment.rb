@@ -117,10 +117,10 @@ module ActiveMerchant
       # @option invoice_data [Integer, String] :total_shipping
       #
       # @option item [String] :identifier
-      # @option item [String] :item_price
+      # @option item [Integer] :item_price Price of an individual item in cents
       # @option item [String] :item_count
       # @option item [String] :name
-      # @option item [String] :price
+      # @option item [Integer] :price Total item line price in cents
       #
       # @option receiver [String] :email
       # @option receiver [Hash] :phone
@@ -361,8 +361,8 @@ module ActiveMerchant
                     x.item do |x|
                       x.name item[:name] if item[:name]
                       x.identifier item[:identifier] if item[:identifier]
-                      x.price item[:price] if item[:price]
-                      x.itemPrice item[:item_price] if item[:item_price]
+                      x.price amount(item[:price]) if item[:price]
+                      x.itemPrice amount(item[:item_price]) if item[:item_price]
                       x.itemCount item[:item_count] if item[:item_count]
                     end
                   end
