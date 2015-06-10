@@ -22,8 +22,8 @@ module Minitest
         start_date: Time.now,
         end_date: 180.days.from_now,
         currency_code: 'USD',
-        max_amount: '100',
-        maxNumberOfPayments: '10'
+        max_amount: 100_00,
+        maxNumberOfPayments: 10
       }
     end
 

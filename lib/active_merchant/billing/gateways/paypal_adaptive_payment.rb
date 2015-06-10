@@ -53,7 +53,7 @@ module ActiveMerchant
       # @option options [String] :sender_email
       # @option options [String] :tracking_id
       #
-      # @option receiver_list [String, Integer] :amount
+      # @option receiver_list [Integer] :amount Amount in cents
       # @option receiver_list [String] :email
       # @option receiver_list [String] :invoice_id
       # @option receiver_list [String] :payment_type
@@ -143,7 +143,7 @@ module ActiveMerchant
       # @option options [Enumerable] :receiver_list
       # @option options [String] :transaction_id
       #
-      # @option receiver_list [String, Integer] :amount
+      # @option receiver_list [Integer] :amount Amount in cents
       # @option receiver_list [String] :email
       # @option receiver_list [String] :primary
       def refund(options)
@@ -166,11 +166,11 @@ module ActiveMerchant
       # @param [Hash] options
       # @option options [String] :cancel_url
       # @option options [String] :currency_code
-      # @option options [String] :display_max_total_amount
+      # @option options [Integer] :display_max_total_amount Max amount to display in cents
       # @option options [DateTime] :end_date
       # @option options [String] :error_language
-      # @option options [String] :max_amount
-      # @option options [String] :max_amount_per_payment
+      # @option options [Integer] :max_amount Max amount in cents
+      # @option options [Integer] :max_amount_per_payment Max amount per payment in cents
       # @option options [String] :max_number_of_payments
       # @option options [String] :memo
       # @option options [String] :notify_url
@@ -207,7 +207,7 @@ module ActiveMerchant
       # @option options [Hash] :currency_list
       # @option options [Enumerable] :to_currencies
       #
-      # @option currency_list [Integer] :amount
+      # @option currency_list [Integer] :amount Amount in cents
       # @option currency_list [String] :code
       def convert_currency(options)
         requires!(options, :currency_list, :to_currencies)
@@ -267,7 +267,7 @@ module ActiveMerchant
             opts[:receiver_list].each do |receiver|
               x.receiver do |x|
                 x.email receiver[:email]
-                x.amount receiver[:amount].to_s
+                x.amount amount(receiver[:amount])
                 x.primary receiver[:primary] if receiver.key?(:primary)
                 x.paymentType receiver[:payment_type] if receiver.key?(:payment_type)
                 x.invoiceId receiver[:invoice_id] if receiver.key?(:invoice_id)
@@ -402,7 +402,7 @@ module ActiveMerchant
           x.receiverList do |x|
             options[:receiver_list].each do |receiver|
               x.receiver do |x|
-                x.amount receiver[:amount]
+                x.amount amount(receiver[:amount])
                 # x.paymentType receiver[:payment_type] ||= 'GOODS' # API specifies "not used"
                 # x.invoiceId receiver[:invoice_id] if receiver[:invoice_id] # API specifies "not used"
                 x.email receiver[:email]
@@ -430,14 +430,14 @@ module ActiveMerchant
 
           x.endingDate opts[:end_date].strftime('%Y-%m-%dT%H:%M:%S')
           x.startingDate opts[:start_date].strftime('%Y-%m-%dT%H:%M:%S')
-          x.maxTotalAmountOfAllPayments opts[:max_amount]
-          x.max_amount_per_payment opts[:max_amount_per_payment] if opts.key?(:max_amount_per_payment)
+          x.maxTotalAmountOfAllPayments amount(opts[:max_amount])
+          x.max_amount_per_payment amount(opts[:max_amount_per_payment]) if opts.key?(:max_amount_per_payment)
           x.memo opts[:memo] if opts.key?(:memo)
           x.max_number_of_payments opts[:max_number_of_payments] if opts.key?(:max_number_of_payments)
           x.currencyCode options[:currency_code]
           x.cancelUrl opts[:cancel_url]
           x.returnUrl opts[:return_url]
-          x.display_max_total_amount opts[:display_max_total_amount] if opts.key?(:display_max_total_amount)
+          x.display_max_total_amount amount(opts[:display_max_total_amount]) if opts.key?(:display_max_total_amount)
 
           x.ipnNotificationUrl opts[:notify_url] if opts.key?(:notify_url)
         end
@@ -476,7 +476,7 @@ module ActiveMerchant
           x.baseAmountList do |x|
             options[:currency_list].each do |currency|
               x.currency do |x|
-                x.amount currency[:amount]
+                x.amount amount(currency[:amount])
                 x.code currency[:code]
               end
             end
