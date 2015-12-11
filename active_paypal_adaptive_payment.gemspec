@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.files = Dir.glob('lib/**/*') + %w(MIT-LICENSE README.md CHANGELOG.md)
   s.require_path = %w(lib)
 
-  s.add_dependency('activemerchant', '>= 1.44.0')
+  s.add_dependency('activemerchant', '>= 1.55.0')
 
   s.add_development_dependency('bundler', '~> 1.8')
 end

@@ -562,7 +562,7 @@ module ActiveMerchant
       end
 
       def test?
-        @options[:test] || Base.gateway_mode == :test
+        @options[:test] || Base.mode == :test
       end
     end
   end
